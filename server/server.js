@@ -22,13 +22,25 @@ connectDB();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ── CORS Config
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://golden-fairy-7c23fe.netlify.app',
+];
+
 app.use(
   cors({
-    origin: ['https://golden-fairy-7c23fe.netlify.app'],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS: ' + origin));
+      }
+    },
     credentials: true,
   })
 );
-
 
 app.get("/", (req, res) => {
   res.json({
@@ -46,7 +58,6 @@ app.get("/", (req, res) => {
   });
 });
 
-
 app.use("/api/auth",         authRouter);
 app.use("/api/admin",        adminRouter);
 app.use("/api/destinations", destinationRouter);
@@ -55,14 +66,12 @@ app.use("/api/bookings",     bookingRouter);
 app.use("/api/reviews",      reviewRouter);
 app.use('/api/payments', paymentRoutes);
 
-
 app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: "Route not found",
   });
 });
-
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -71,7 +80,6 @@ app.use((err, req, res, next) => {
     message: "Server error",
   });
 });
-
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
