@@ -24,9 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      callback(null, true);
-    },
+    origin: ['https://golden-fairy-7c23fe.netlify.app'],
     credentials: true,
   })
 );
